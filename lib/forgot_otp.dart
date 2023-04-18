@@ -1,0 +1,273 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_verification_code/flutter_verification_code.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
+
+class ForGotOtp extends StatefulWidget {
+  const ForGotOtp({Key? key}) : super(key: key);
+
+  @override
+  State<ForGotOtp> createState() => _ForGotOtpState();
+}
+
+class _ForGotOtpState extends State<ForGotOtp> {
+  String digitInputValue = "";
+  bool isLoading = true;
+
+  late String id;
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      id = ModalRoute.of(context)!.settings.arguments.toString();
+      print("$id");
+      access(context);
+    });
+  }
+
+  access(BuildContext context) {
+    Future.delayed(Duration(seconds: 1), () {
+      setState(() {
+        isLoading = false;
+      });
+    });
+  }
+
+  void digit(String otp, String userId) async {
+    try {
+      var response = await post(
+          Uri.parse(
+              'https://shopping-app-backend-t4ay.onrender.com/user/verifyOtpOnForgotPassword'),
+          body: {
+            'userId': userId,
+            'otp': otp,
+          });
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body.toString());
+        print('data');
+        print(data['token']);
+        print("OTP verified!");
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/navbar', (Route<dynamic> route) => false);
+        Fluttertoast.showToast(
+            msg: "OTP verified!!!",
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16);
+      } else if (response.statusCode == 400) {
+        var data = jsonDecode(response.body.toString());
+        print(data);
+        print("User not Registered");
+        Fluttertoast.showToast(
+            msg: "Enter Valid OTP",
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16);
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  void send(String userId) async {}
+
+  bool _isResendAgain = false;
+  bool _isVerified = false;
+  bool _isLoading = false;
+
+  late Timer _timer;
+  int _start = 60;
+
+  void resend(String userId) async {
+    try {
+      var response1 = await post(
+          Uri.parse(
+              'https://shopping-app-backend-t4ay.onrender.com/user/resendOtp'),
+          body: {'userId': userId});
+      if (response1.statusCode == 200) {
+        var data = jsonDecode(response1.body.toString());
+        print(data);
+        print("OTP send again");
+        setState(() {
+          _isResendAgain = true;
+        });
+
+        const oneSec = Duration(seconds: 1);
+        _timer = Timer.periodic(oneSec, (timer) {
+          setState(() {
+            if (_start == 0) {
+              _start = 60;
+              _isResendAgain = false;
+              timer.cancel();
+            } else {
+              _start--;
+            }
+          });
+        });
+        Fluttertoast.showToast(
+            msg: "Resend the OTP!!",
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16);
+      } else if (response1.statusCode == 400) {
+        var data = jsonDecode(response1.body.toString());
+        print(data);
+        print("Something went wrong!!!!");
+        Fluttertoast.showToast(
+            msg: "Something went wrong!!",
+            toastLength: Toast.LENGTH_LONG,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.black,
+            textColor: Colors.white,
+            fontSize: 16);
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  verify() {
+    setState(() {
+      _isLoading = true;
+    });
+
+    const oneSec = Duration(milliseconds: 1000);
+    _timer = Timer.periodic(oneSec, (timer) {
+      setState(() {
+        _isLoading = false;
+        _isVerified = true;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        physics: ScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: double.infinity,
+          child: isLoading
+              ? Center(child: CircularProgressIndicator())
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.asset("assets/image95.jpg"),
+                    const SizedBox(
+                      height: 80,
+                    ),
+                    const Text(
+                      "Verification",
+                      style:
+                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Text(
+                      "Please enter the 4 digit code sent to you number",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey.shade500,
+                          height: 1.5),
+                    ),
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    VerificationCode(
+                      length: 4,
+                      textStyle: const TextStyle(fontSize: 20),
+                      underlineColor: Colors.blueAccent,
+                      keyboardType: TextInputType.number,
+                      onCompleted: (value) {
+                        digitInputValue = value;
+                      },
+                      onEditing: (value) {},
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Don't recieve the OTP?",
+                          style: TextStyle(
+                              fontSize: 14, color: Colors.grey.shade500),
+                        ),
+                        TextButton(
+                            onPressed: () {
+                              Future.delayed(Duration(seconds: 2), () {
+                                print("$id");
+                                if (_isResendAgain) return;
+                                // print('$id');
+                                resend(id);
+                              });
+                            },
+                            child: Text(
+                              _isResendAgain
+                                  ? "Try again in  $_start"
+                                  : "Resend",
+                              style: const TextStyle(
+                                color: Colors.blueAccent,
+                              ),
+                            ))
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 50,
+                    ),
+                    MaterialButton(
+                      disabledColor: Colors.grey.shade300,
+                      onPressed: () {
+                        verify();
+
+                        digit(digitInputValue.toString(), id);
+                      },
+                      color: Colors.blueAccent,
+                      minWidth: MediaQuery.of(context).size.width / 3,
+                      height: 50,
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                backgroundColor: Colors.white,
+                                strokeWidth: 3,
+                                color: Colors.blue,
+                              ),
+                            )
+                          : _isVerified
+                              ? const Icon(
+                                  Icons.check_circle,
+                                  color: Colors.white,
+                                  size: 30,
+                                )
+                              : const Text(
+                                  "Verify",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                    )
+                  ],
+                ),
+        ),
+      ),
+    );
+  }
+}
