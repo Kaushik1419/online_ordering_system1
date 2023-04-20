@@ -77,16 +77,24 @@ class _AccountState extends State<Account> {
                         child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                        Text('Name : ${emailId.toString()}',style: TextStyle(fontWeight: FontWeight.bold),),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [Icon(CupertinoIcons.profile_circled),Text('${emailId.toString()}',style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),)]),
                         SizedBox(
                           height: 4,
                         ),
-                        Text('Number : ${mobileNo.toString()}', style: const TextStyle(fontWeight: FontWeight.bold),),
+                        Row(mainAxisAlignment: MainAxisAlignment.center,
+                        children: [Icon(Icons.phone),Text('${mobileNo.toString()}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),)]),
                         SizedBox(
                           height: 4,
                         ),
                         Container(
-                            child: Text("Email Id : ${name.toString()}", style: const TextStyle(fontWeight: FontWeight.bold),))
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [Icon(Icons.email),
+                                Text(" ${name.toString()}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+                              ],
+                            ))
                     ],
                   ),
                       );

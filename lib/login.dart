@@ -1,9 +1,8 @@
-import 'dart:convert';
 
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:online_ordering_system1/GetX/get_login_api.dart';
+import 'package:get/get.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -13,71 +12,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool StatusCode = false;
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController emailController = TextEditingController();
-  final String emailIdInput = "";
-  final String passwordInput = "";
   final _formkey1 = GlobalKey<FormState>();
   bool _obsecuretext = true;
-  String code = "";
-  String? name1;
-  String? emailId;
-  String? mobileNo;
-  void login(String emailId, String password) async {
-    try {
-      print(emailId);
-      print(password);
-
-      var response = await http.post(
-          Uri.parse(
-              'https://shopping-app-backend-t4ay.onrender.com/user/login'),
-          body: {
-            "emailId": emailId,
-            "password": password,
-          });
-
-      if (response.statusCode == 200) {
-        var data = jsonDecode(response.body.toString());
-        print(data);
-        var value = data['data']['jwtToken'];
-         name1 = data['data']['name'];
-        StatusCode = true;
-         emailId = data['data']['emailId'];
-         mobileNo = data['data']['mobileNo'];
-       // print(mobileNo);
-        var status = data['data']['status'];
-        print('$value');
-        addStringToTSF(value, name1!, emailId , mobileNo!, StatusCode);
-        print('Login Successful');
-        Navigator.of(context).pushNamed('/navbar');
-
-        StatusCode = true;
-      } else if (response.statusCode == 400) {
-        var data = jsonDecode(response.body.toString());
-        print(data);
-        print("Enter the valid value");
-      }
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-  addStringToTSF(String value, String email, String name, String mobileNo, bool StatusCode) async {
-   // print(value);
-   // print(name);
-    //print(mobileNo);
-    //print(email);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('email', email);
-    prefs.setString('jwtToken', value);
-    prefs.setString('name', name);
-    prefs.setString('mobileNo', mobileNo);
-    prefs.setBool('statusCode', true);
-    print(mobileNo);
-    print(name);
-    print(email);
-  }
-
+LoginGetX loginController = Get.put(LoginGetX());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,10 +51,7 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 1.2,
                     child: TextFormField(
-                      controller: emailController,
-                      onChanged: (value) {
-                        value = emailIdInput;
-                      },
+                      controller: loginController.emailController.value,
                       validator: (String? value) {
                         if (value!.isEmpty && !EmailValidator.validate(value)) {
                           return "Enter your password";
@@ -142,10 +76,8 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 1.2,
                     child: TextFormField(
-                      controller: passwordController,
-                      onChanged: (value) {
-                        value = passwordInput;
-                      },
+                      controller: loginController.passwordController.value,
+
                       validator: (String? value) {
                         if (value!.isEmpty) {
                           return 'Enter your password';
@@ -203,15 +135,18 @@ class _LoginPageState extends State<LoginPage> {
                     height: 50,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_formkey1.currentState!.validate()) {
-                            print("test");
-                            login(
-                                emailController.text, passwordController.text);
-                          }
-                        },
-                        child: const Text("Login"),
+                      child: Obx(() =>
+                         loginController.isLoading.value ? Center(child: CircularProgressIndicator()) : ElevatedButton(
+                          onPressed: () {
+                            if (_formkey1.currentState!.validate()) {
+                              print("test");
+                              loginController.login(
+                                  loginController.emailController.value.text, loginController.passwordController.value.text);
+
+                            }
+                          },
+                          child: const Text("Login"),
+                        ),
                       ),
                     ),
                   ),

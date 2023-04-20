@@ -3,6 +3,8 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
+import 'package:online_ordering_system1/GetX/getx_register_api.dart';
+import 'package:get/get.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -12,6 +14,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  SignUpGetx signUpGetx = Get.put(SignUpGetx());
   String nameInputValue = "";
   String emailIdInputValue = "";
   String mobileInputValue = "";
@@ -116,7 +119,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         }
                         return null;
                       },
-                      controller: emailIdController,
+                      controller: signUpGetx.emailIdController.value,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
                         prefixIcon: const Icon(Icons.mail_rounded),
@@ -141,7 +144,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           nameInputValue = value;
                         });
                       },
-                      controller: nameController,
+                      controller: signUpGetx.nameController.value,
                       validator: (value) {
                         if (value!.isEmpty) {
                           return "Enter your Name";
@@ -171,7 +174,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           mobileInputValue = value;
                         });
                       },
-                      controller: mobileNoController,
+                      controller: signUpGetx.mobileNoController.value,
                       validator: (value) {
                         if (value!.isEmpty && value == 10) {
                           return "Enter your contact number";
@@ -199,10 +202,10 @@ class _SignUpPageState extends State<SignUpPage> {
                       onChanged: (value) {
                         passwordInputValue = value;
                       },
-                      controller: passController,
+                      controller: signUpGetx.passController.value,
                       validator: (value) {
                         if (value!.isEmpty) {
-                          return "String is not Empty";
+                          return "Password is not Empty";
                         }
                         return null;
                       },
@@ -276,20 +279,22 @@ class _SignUpPageState extends State<SignUpPage> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 1.2,
                     height: 50,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_formkey.currentState!.validate()) {
-                            register(
-                              nameInputValue.toString(),
-                              emailIdInputValue.toString(),
-                              mobileInputValue.toString(),
-                              passwordInputValue.toString(),
-                            );
-                          }
-                        },
-                        child: const Text("Verify"),
+                    child: Obx(() =>
+                    ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child:signUpGetx.isLoaded.value ? Center(child: CircularProgressIndicator(),): ElevatedButton(
+                          onPressed: () {
+                            if (_formkey.currentState!.validate()) {
+                              signUpGetx.register(
+                                signUpGetx.nameController.value.toString(),
+                                signUpGetx.emailIdController.value.toString(),
+                                signUpGetx.mobileNoController.value.toString(),
+                                signUpGetx.passController.value.toString(),
+                              );
+                            }
+                          },
+                          child: const Text("Verify"),
+                        ),
                       ),
                     ),
                   ),

@@ -3,6 +3,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 import 'package:online_ordering_system1/account.dart';
 import 'package:online_ordering_system1/addtocart.dart';
 import 'package:online_ordering_system1/bottomnav.dart';
@@ -71,8 +72,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<GetItemsCart>(
             create: (context) => GetItemsCart()),
       ],
-      child: MaterialApp(
+      child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
+        theme: ThemeData.light(),
         initialRoute: '/',
         routes: {
           '/': (context) => const Splash(),
@@ -93,6 +95,11 @@ class MyApp extends StatelessWidget {
           '/trialpage': (context) => const TrailOnly(),
           '/changeThePassword': (context) => const ChangePassword(),
         },
+        getPages: [
+          GetPage(name: '/', page: () => Splash()),
+          GetPage(name: '/navbar', page: () => BottomBar(), transition: Transition.fadeIn),
+          GetPage(name: '/verificationpage', page: () => Verification()),
+        ],
         title: 'Online Ordering System',
       ),
     );

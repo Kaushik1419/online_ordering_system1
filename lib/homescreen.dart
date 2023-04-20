@@ -274,6 +274,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   childAspectRatio: 0.67, crossAxisCount: 2),
                           itemCount: getItemProvider.data[0].data.length,
                           itemBuilder: (BuildContext context, index) {
+                            String productId =
+                                getItemProvider
+                                    .data[0]
+                                    .data[index]
+                                    .id;
                             //  print("${getItemProvider.data[0].data[index]}");
                             return Container(
                               child: Card(
@@ -511,11 +516,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       2.29,
                                                   child: ElevatedButton(
                                                     onPressed: () async {
-                                                      String productId =
-                                                          getItemProvider
-                                                              .data[0]
-                                                              .data[index]
-                                                              .id;
                                                       addCartProvider
                                                           .addToCart(productId);
                                                       print(
@@ -525,7 +525,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       await sendPushNotification(fcmToken!);
                                                       SharedPreferences pref = await SharedPreferences.getInstance();
                                                       pref.setString('fcmToken', fcmToken);
-getItemProvider.data[0].data[index];
+                                                      getItemProvider.getData(context: context);
                                                     },
                                                     child: Text("Add to Cart"),
                                                   ),

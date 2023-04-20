@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_verification_code/flutter_verification_code.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
+import 'package:get/get.dart';
+import 'package:online_ordering_system1/GetX/getx_verification_api.dart';
 
 class Verification extends StatefulWidget {
   const Verification({Key? key}) : super(key: key);
@@ -17,7 +19,8 @@ class _VerificationState extends State<Verification> {
   String digitInputValue = "";
   bool isLoading = true;
 
-  late String id;
+  late String id = Get.arguments('userId');
+VerificationController verificationController = Get.put(VerificationController());
   @override
   void initState() {
     // TODO: implement initState
@@ -45,7 +48,7 @@ class _VerificationState extends State<Verification> {
             'userId': id,
             'otp': digitInputValue,
           });
-
+      print(id);
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body.toString());
         print('data');
@@ -142,7 +145,7 @@ class _VerificationState extends State<Verification> {
           height: MediaQuery.of(context).size.height,
           width: double.infinity,
           child: isLoading == true
-              ? CircularProgressIndicator()
+              ? Center(child: CircularProgressIndicator())
               : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -176,6 +179,7 @@ class _VerificationState extends State<Verification> {
                       underlineColor: Colors.blueAccent,
                       keyboardType: TextInputType.number,
                       onCompleted: (value) {
+                        verificationController.oook();
                         digitInputValue = value;
                       },
                       onEditing: (value) {},
@@ -214,7 +218,7 @@ class _VerificationState extends State<Verification> {
                       disabledColor: Colors.grey.shade300,
                       onPressed: () {
                         verify();
-
+                        print(id);
                         digit(digitInputValue.toString(), id);
                       },
                       color: Colors.blueAccent,

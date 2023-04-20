@@ -65,40 +65,6 @@ class _DetailItemState extends State<DetailItem> {
   Widget build(BuildContext context) {
     print('${arguments['imageUrlArg'].toString()}');
     return Scaffold(
-      // bottomNavigationBar: BottomAppBar(
-      //   child: SizedBox(
-      //     height: 60,
-      //     child: Row(
-      //       mainAxisSize: MainAxisSize.max,
-      //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-      //       crossAxisAlignment: CrossAxisAlignment.stretch,
-      //       children: <Widget>[
-      //         Expanded(
-      //             child: ElevatedButton(
-      //           onPressed: () {},
-      //           style: ElevatedButton.styleFrom(
-      //               foregroundColor: Colors.grey,
-      //               backgroundColor: Colors.grey.shade100,
-      //               shape: const RoundedRectangleBorder(
-      //                   borderRadius: BorderRadius.zero)),
-      //           child: const Text(
-      //             "Add to Cart",
-      //             style: TextStyle(color: Colors.blue),
-      //           ),
-      //         )),
-      //         Expanded(
-      //             child: ElevatedButton(
-      //                 onPressed: () {
-      //                   setState(() {});
-      //                 },
-      //                 style: ElevatedButton.styleFrom(
-      //                     shape: const RoundedRectangleBorder(
-      //                         borderRadius: BorderRadius.zero)),
-      //                 child: const Text("Buy Now")))
-      //       ],
-      //     ),
-      //   ),
-      // ),
       backgroundColor: Colors.grey.shade50,
       body: SingleChildScrollView(
         child: Center(
@@ -107,7 +73,13 @@ class _DetailItemState extends State<DetailItem> {
             child: Stack(
               children: [
                 isLoading
-                    ? CircularProgressIndicator()
+                    ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Center(child: CircularProgressIndicator()),
+                      ],
+                    )
                     : Column(
                         children: [
                           Stack(

@@ -9,10 +9,12 @@ class GetItemsCart with ChangeNotifier {
   List<CartStatus> cartDataList = [];
   var cartItemId = '';
   String total = '';
-  bool isLoaded = true;
+  bool isLoaded = false;
   bool? StatusCode;
+
   Future<List<CartStatus>> getCartData() async {
     try {
+      isLoaded = true;
       SharedPreferences preferences = await SharedPreferences.getInstance();
       String jwtToken = preferences.getString('jwtToken') ?? '';
       StatusCode = (preferences.getBool('statusCode') ?? '') as bool?;
